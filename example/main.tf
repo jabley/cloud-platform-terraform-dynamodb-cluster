@@ -1,5 +1,6 @@
 terraform {
-  backend "s3" {}
+  backend "s3" {
+  }
 }
 
 provider "aws" {
@@ -13,7 +14,7 @@ provider "aws" {
  *
  */
 module "example_team_dynamodb" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-dynamodb-cluster?ref=2.0"
+  source = "../"
 
   team_name              = "example-team"
   business-unit          = "example-bu"
@@ -29,14 +30,15 @@ module "example_team_dynamodb" {
 
 resource "kubernetes_secret" "example_team_dynamodb" {
   metadata {
-    name      = "example-team-dynamodb-output"
-    namespace = "my-namespace"
+    name      = "cp-team-dynamodb-output"
+    namespace = "poornima-dev"
   }
 
-  data {
-    table_name        = "${module.example_team_dynamodb.table_name}"
-    table_arn         = "${module.example_team_dynamodb.table_arn}"
-    access_key_id     = "${module.example_team_dynamodb.access_key_id}"
-    secret_access_key = "${module.example_team_dynamodb.secret_access_key}"
+  data = {
+    table_name        = module.example_team_dynamodb.table_name
+    table_arn         = module.example_team_dynamodb.table_arn
+    access_key_id     = module.example_team_dynamodb.access_key_id
+    secret_access_key = module.example_team_dynamodb.secret_access_key
   }
 }
+
